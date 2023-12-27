@@ -144,11 +144,11 @@ class TeamView(View):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             route = team.route.split(",")
-            postion = request.POST.get("postion", "")
+            postion = request.POST.get("position", "")
             if postion == route[team.index]:
                 team.index += 1
                 team.save()
-                headers = {"Content-Type": "text/plain; charset=utf-8"}
+                headers = {"Content-Type": "text/plain; charset=utf-8,"}
                 if team.index == len(route):
                     return HttpResponse(
                         "Finished", headers=headers, status=status.HTTP_200_OK
