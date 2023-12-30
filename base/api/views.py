@@ -1,4 +1,5 @@
 import json
+from base.api.consumers import TrackConsumer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.http import HttpResponse
@@ -14,6 +15,9 @@ from django.views import View
 
 
 from base.models import Team
+
+from channels.layers import get_channel_layer
+from asgiref.sync import sync_to_async
 
 
 def index(request):
@@ -148,6 +152,14 @@ class TeamView(View):
             if postion == route[team.index]:
                 team.index += 1
                 team.save()
+                consumer_instance = TrackConsumer.get_consumer_instance(
+                    teamId
+                )  # Calling for consumer to update
+                if consumer_instance:
+                    # Use async_to_sync to call the update method asynchronously
+                    consumer_instance.update()
+                    print("updated")
+
                 headers = {"Content-Type": "text/plain; charset=utf-8,"}
                 if team.index == len(route):
                     return HttpResponse(
@@ -188,7 +200,16 @@ class TeamView(View):
 
             if bool(match):
                 team.route = route
+                team.index = 0
                 team.save()
+                consumer_instance = TrackConsumer.get_consumer_instance(
+                    teamId
+                )  # Calling for consumer to update
+                if consumer_instance:
+                    # Use async_to_sync to call the update method asynchronously
+                    consumer_instance.update()
+                    print("updated")
+
                 return Response("Route Added", status=status.HTTP_200_OK)
 
             else:
@@ -215,6 +236,13 @@ class TeamView(View):
 
             team.index = 0
             team.save()
+            consumer_instance = TrackConsumer.get_consumer_instance(
+                teamId
+            )  # Calling for consumer to update
+            if consumer_instance:
+                # Use async_to_sync to call the update method asynchronously
+                consumer_instance.update()
+                print("updated")
             return Response("Route Reset", status=status.HTTP_200_OK)
 
         except KeyError:
