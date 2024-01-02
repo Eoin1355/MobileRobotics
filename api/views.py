@@ -137,11 +137,8 @@ class TeamView(View):
             if postion == route[team.index]:
                 team.index += 1
                 team.save()
-                consumer_instance = TrackConsumer.get_consumer_instance(
-                    teamId
-                )  # Calling for consumer to update
+                consumer_instance = TrackConsumer.get_consumer_instance(teamId)
                 if consumer_instance:
-                    # Use async_to_sync to call the update method asynchronously
                     consumer_instance.update()
                     print("updated")
 

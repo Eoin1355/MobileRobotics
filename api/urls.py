@@ -8,7 +8,7 @@ urlpatterns = [
     path("getTeam/<str:teamId>", views.TeamView.get),
     path("postTeam", views.TeamView.post),
     path("deleteTeam/<str:teamId>", views.TeamView.delete),
-    path("getTeams", views.TeamView.getTeams),
+    path("getTeams/", views.TeamView.getTeams),
     path("arrived/<str:teamId>", views.TeamView.arrived),
     path("postRoute", views.TeamView.post_route),
     path("resetRoute", views.TeamView.reset_route),
