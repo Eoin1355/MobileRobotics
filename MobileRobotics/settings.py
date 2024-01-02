@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "base.apps.BaseConfig",
     "rest_framework",
     "corsheaders",
-    "authentication",
     "rest_framework_simplejwt.token_blacklist",
 ]
 
@@ -145,11 +144,6 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.TokenAuthentication',
-#     ),
-# }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),

@@ -12,13 +12,8 @@ urlpatterns = [
     path("arrived/<str:teamId>", views.TeamView.arrived),
     path("postRoute", views.TeamView.post_route),
     path("resetRoute", views.TeamView.reset_route),
+    path("getRoute/<str:teamId>", views.TeamView.getRoute),
     # Validation API
     path("validate_token/", views.ValidationView.validate_token),
     path("signout/", views.ValidationView.signout),
 ]
-
-
-# path('teamid/<str:teamId>', views.getTeam),
-# path('postTeamId/', views.postTeam),
-# path('arrived/<str:teamId>', views.arrived),
-# path("postRoute", views.post_route),

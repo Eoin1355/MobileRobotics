@@ -1,31 +1,16 @@
-import json
-from base.api.consumers import TrackConsumer
+import re
+from api.consumers import TrackConsumer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from .serializers import TeamSerializer, PostTeamSerializer
-import re
-from django.shortcuts import render
-from django.http import HttpResponse
-
-
 from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from django.views import View
-
-
 from base.models import Team
-
-from channels.layers import get_channel_layer
-from asgiref.sync import sync_to_async
-
-
-def index(request):
-    return render(request, "chat/index.html")
-
-
-# def room(request, room_name):
-#     return render(request, "chat/room.html", {"room_name": room_name})
 
 
 @api_view(["GET"])
@@ -70,7 +55,7 @@ class TeamView(View):
             )
 
     @api_view(["GET"])
-    # @permission_classes([IsAuthenticated])
+    @permission_classes([IsAuthenticated])
     def getTeams(request):
         try:
             teams = Team.objects.all()
@@ -251,14 +236,31 @@ class TeamView(View):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    # @api_view(["POST"])
-    # def reset_route(request):
-    #     try:
+    @api_view(["GET"])
+    def getRoute(request, teamId):
+        try:
+            if not teamId:
+                return Response(
+                    {"error": "Missing 'teamId' in request data"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                team_instance = Team.objects.get(teamId=teamId)
+                team_instance.route
 
+                return HttpResponse(team_instance.route)
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework_simplejwt.tokens import RefreshToken
+            except Team.DoesNotExist:
+                return HttpResponse(
+                    {"error": f"Team with ID {teamId} not found"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+        except Exception as e:
+            return HttpResponse(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class ValidationView(View):

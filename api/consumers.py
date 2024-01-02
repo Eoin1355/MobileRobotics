@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
-from base.api.serializers import TeamSerializer
+from api.serializers import TeamSerializer
 from base.models import Team
 
 
@@ -20,6 +20,8 @@ class TrackConsumer(WebsocketConsumer):
 
     def disconnect(self, close_code):
         self.close()
+        team_id = self.get_team_id_from_url()
+        self.consumers.pop(team_id)
 
     def update(self):
         team_id = self.get_team_id_from_url()
