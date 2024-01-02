@@ -125,6 +125,7 @@ class TeamView(View):
 
     @api_view(["POST"])
     def arrived(request, teamId):
+        headers = {"Content-Type": "text/plain; charset=utf-8,"}
         try:
             team = Team.objects.get(teamId=teamId)
             if not team:
@@ -134,35 +135,41 @@ class TeamView(View):
                 )
             route = team.route.split(",")
             postion = request.POST.get("position", "")
-            if postion == route[team.index]:
-                team.index += 1
-                team.save()
-                consumer_instance = TrackConsumer.get_consumer_instance(teamId)
-                if consumer_instance:
-                    consumer_instance.update()
-                    print("updated")
-
-                headers = {"Content-Type": "text/plain; charset=utf-8,"}
-                if team.index == len(route):
-                    return HttpResponse(
-                        "Finished", headers=headers, status=status.HTTP_200_OK
-                    )
+            if team.index == len(route):
                 return HttpResponse(
-                    route[team.index], headers=headers, status=status.HTTP_200_OK
+                    "Already Finished", headers=headers, status=status.HTTP_200_OK
                 )
             else:
-                return Response(
-                    "Incorrect position", status=status.HTTP_400_BAD_REQUEST
-                )
+                if postion == route[team.index]:
+                    team.index += 1
+                    team.save()
+                    consumer_instance = TrackConsumer.get_consumer_instance(teamId)
+                    if consumer_instance:
+                        consumer_instance.update()
+                        print("updated")
+
+                    if team.index == len(route):
+                        return HttpResponse(
+                            "Finished", headers=headers, status=status.HTTP_200_OK
+                        )
+                    return HttpResponse(
+                        route[team.index], headers=headers, status=status.HTTP_200_OK
+                    )
+                else:
+                    return HttpResponse(
+                        "Incorrect position",
+                        headers=headers,
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
 
         except Team.DoesNotExist:
-            return Response(
-                {"error": "No Team with that id"}, status=status.HTTP_400_BAD_REQUEST
+            return HttpResponse(
+                {"No Team with that id"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         except KeyError:
-            return Response(
-                {"error": "Missing 'team_id' in request data"},
+            return HttpResponse(
+                {"Missing 'team_id' in request data"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
